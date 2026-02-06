@@ -9,9 +9,8 @@ COPY package.json package-lock.json ./
 # Install dependencies
 RUN npm ci --omit=dev
 
-# Copy application code
-COPY src ./src
-COPY public ./public
+# Copy all application code
+COPY . .
 
 # Expose port
 EXPOSE 3000

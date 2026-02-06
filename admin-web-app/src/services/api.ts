@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 
-const API_BASE_URL = 'http://localhost:7777/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://artandcraft-platform-production.up.railway.app/api/v1';
 
 class ApiService {
   private api: AxiosInstance;

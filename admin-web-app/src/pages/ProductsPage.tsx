@@ -6,6 +6,8 @@ import apiService from '../services/api';
 import { usePagination, useDelete, useForm, useToast } from '../hooks';
 import { CommonRules, ValidationRules } from '../utils/validation';
 
+const API_URL = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'https://artandcraft-platform-production.up.railway.app';
+
 interface Product {
   id: number;
   name: string;
@@ -254,11 +256,11 @@ const ProductsPage: React.FC = () => {
         
         return imageUrl ? (
           <img 
-            src={`http://localhost:7777${imageUrl}`} 
+            src={`${API_URL}${imageUrl}`} 
             alt={product?.name}
             className="w-12 h-12 rounded object-cover cursor-pointer"
             onClick={() => setPreviewImage({ 
-              url: `http://localhost:7777${imageUrl}`, 
+              url: `${API_URL}${imageUrl}`, 
               productName: product?.name || 'Product' 
             })}
             onError={(e) => {
@@ -443,7 +445,7 @@ const ProductsPage: React.FC = () => {
                 {uploadedImages.map((image, idx) => (
                   <div key={idx} className="relative group">
                     <img 
-                      src={`http://localhost:7777${image.imageUrl}`} 
+                      src={`${API_URL}${image.imageUrl}`} 
                       alt={image.altText || `Image ${idx + 1}`}
                       className="w-full h-24 rounded object-cover"
                       onError={(e) => {
@@ -520,7 +522,7 @@ const ProductsPage: React.FC = () => {
                 <div className="grid grid-cols-3 gap-2">
                   {uploadedImages.map((img) => (
                     <div key={img.id} className="relative">
-                      <img src={`http://localhost:7777${img.imageUrl}`} alt={img.altText} className="w-full h-24 object-cover rounded" />
+                      <img src={`${API_URL}${img.imageUrl}`} alt={img.altText} className="w-full h-24 object-cover rounded" />
                       <button
                         type="button"
                         onClick={async () => {

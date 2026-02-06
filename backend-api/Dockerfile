@@ -1,4 +1,4 @@
-// Dockerfile for Node.js API
+# Dockerfile for Node.js API
 FROM node:18-alpine
 
 WORKDIR /app

@@ -12,7 +12,7 @@
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "migrate": "node -e \"import('./src/database/migrate.js').then(m => m.default()).catch(e => { console.error(e); process.exit(1); })\"",
-    "seed": "node -e \"import('./src/database/seed.js').then(m => m.default()).catch(e => { console.error(e); process.exit(1); })\"",
+    "seed": "node src/seed.js",
     "setup": "npm install && npm run migrate && npm run seed"
   },
   "keywords": [

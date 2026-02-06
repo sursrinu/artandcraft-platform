@@ -112,9 +112,11 @@ const startServer = async () => {
       }
     }
     
-    // Sync database tables
+    // Sync database tables - disable foreign key checks temporarily
     console.log('🔄 Syncing database tables...');
-    await sequelize.sync({ alter: false });
+    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
+    await sequelize.sync({ force: true }); // Create all tables fresh
+    await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
     console.log('✅ Database synchronized');
 
   } catch (error) {

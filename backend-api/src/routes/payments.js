@@ -2,7 +2,7 @@
 import express from 'express';
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
-import { authenticateToken } from '../middleware/auth.js';
+import { authenticate } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -30,7 +30,7 @@ export const setupPaymentRoutes = (database) => {
  * Create a Razorpay order
  * POST /api/payments/razorpay/create-order
  */
-router.post('/razorpay/create-order', authenticateToken, async (req, res) => {
+router.post('/razorpay/create-order', authenticate, async (req, res) => {
   try {
     const { orderId, amount, currency = 'INR' } = req.body;
 
@@ -101,7 +101,7 @@ router.post('/razorpay/create-order', authenticateToken, async (req, res) => {
  * Verify Razorpay payment signature
  * POST /api/payments/razorpay/verify
  */
-router.post('/razorpay/verify', authenticateToken, async (req, res) => {
+router.post('/razorpay/verify', authenticate, async (req, res) => {
   try {
     const {
       razorpay_order_id,
@@ -255,7 +255,7 @@ router.post('/razorpay/webhook', express.raw({ type: 'application/json' }), asyn
  * Initiate a refund
  * POST /api/payments/razorpay/refund
  */
-router.post('/razorpay/refund', authenticateToken, async (req, res) => {
+router.post('/razorpay/refund', authenticate, async (req, res) => {
   try {
     const { orderId, amount, reason } = req.body;
 

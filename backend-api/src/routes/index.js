@@ -35,6 +35,52 @@ export const setupRoutes = (db) => {
   router.use('/bank-accounts', bankAccountsRouter);
   router.use('/payments', paymentsRouter);
   
+  // Seed endpoint (protected with secret)
+  router.post('/seed-admin', async (req, res) => {
+    const { secret } = req.body;
+    if (secret !== 'artcraft-seed-2026') {
+      return res.status(401).json({ success: false, message: 'Invalid secret' });
+    }
+    
+    try {
+      const bcrypt = (await import('bcryptjs')).default;
+      
+      // Check if admin already exists
+      const existingAdmin = await db.User.findOne({
+        where: { email: 'admin@artandcraft.com' }
+      });
+      
+      if (existingAdmin) {
+        return res.json({ success: true, message: 'Admin user already exists' });
+      }
+      
+      // Hash password
+      const hashedPassword = await bcrypt.hash('Admin@123', 10);
+      
+      // Create admin user
+      await db.User.create({
+        name: 'Admin User',
+        email: 'admin@artandcraft.com',
+        password: hashedPassword,
+        userType: 'admin',
+        phone: '+1234567890',
+        isActive: true,
+        isVerified: true,
+      });
+      
+      res.json({ 
+        success: true, 
+        message: 'Admin user created',
+        credentials: {
+          email: 'admin@artandcraft.com',
+          password: 'Admin@123'
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+  
   return router;
 };
 

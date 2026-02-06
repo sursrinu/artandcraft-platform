@@ -30,3 +30,4 @@ EXPOSE 80
 # Start nginx with envsubst for PORT variable
 CMD ["sh", "-c", "envsubst '$$PORT' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
 CMD ["nginx", "-g", "daemon off;"]
+# Cache bust: Fri Feb  6 20:42:04 IST 2026

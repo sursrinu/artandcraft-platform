@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: artandcraft-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: artandcraft
+      MYSQL_USER: artandcraft
+      MYSQL_PASSWORD: artandcraft_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - artandcraft-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: artandcraft-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - artandcraft-network
+
+  api:
+    build:
+      context: ./backend-api
+      dockerfile: Dockerfile
+    container_name: artandcraft-api
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      DB_HOST: mysql
+      DB_USER: artandcraft
+      DB_PASSWORD: artandcraft_password
+      DB_NAME: artandcraft
+      REDIS_HOST: redis
+    depends_on:
+      - mysql
+      - redis
+    volumes:
+      - ./backend-api:/app
+      - /app/node_modules
+    networks:
+      - artandcraft-network
+    command: npm run dev
+
+  admin-php:
+    build:
+      context: ./admin-web-app
+      dockerfile: Dockerfile
+    container_name: artandcraft-admin-php
+    environment:
+      DB_HOST: mysql
+      DB_USER: artandcraft
+      DB_PASSWORD: artandcraft_password
+      DB_DATABASE: artandcraft
+      REDIS_HOST: redis
+      API_BASE_URL: http://api:3000/api/v1
+    depends_on:
+      - mysql
+      - redis
+    volumes:
+      - ./admin-web-app:/var/www/html
+    networks:
+      - artandcraft-network
+
+  admin-nginx:
+    image: nginx:alpine
+    container_name: artandcraft-admin-nginx
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./admin-web-app:/var/www/html
+      - ./admin-web-app/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - admin-php
+    networks:
+      - artandcraft-network
+
+volumes:
+  mysql_data:
+
+networks:
+  artandcraft-network:
+    driver: bridge

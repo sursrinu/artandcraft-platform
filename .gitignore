@@ -1,0 +1,57 @@
+# Flutter
+.dart_tool/
+.flutter-plugins
+.packages
+*.lock
+build/
+.env
+
+# Android
+android/local.properties
+android/.gradle
+android/captures/
+android/gradlew.bat
+android/gradlew
+.android/
+
+# iOS
+ios/Pods/
+ios/Podfile.lock
+ios/.symlinks/
+ios/Flutter/Generated.xcconfig
+
+# Web
+web/packages/
+web/.dart_tool/
+
+# Laravel
+admin-web-app/vendor/
+admin-web-app/.env
+admin-web-app/.env.*.php
+admin-web-app/.env.backup
+admin-web-app/bootstrap/cache/
+admin-web-app/storage/logs/
+admin-web-app/storage/debugbar/
+admin-web-app/node_modules/
+admin-web-app/public/storage
+admin-web-app/public/hot
+
+# Backend API
+backend-api/node_modules/
+backend-api/.env
+backend-api/dist/
+backend-api/coverage/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+*.iml
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+*.log
+npm-debug.log*

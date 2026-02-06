@@ -8,6 +8,8 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './config/swagger.js';
 import db from './models/index.js';
 import routes, { setupRoutes } from './routes/index.js';
 import { errorHandler } from './middleware/errorHandler.js';
@@ -26,8 +28,9 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
   contentSecurityPolicy: {
     directives: {
+      defaultSrc: ["'self'"],
       imgSrc: ["'self'", 'data:', 'https:'],
-      scriptSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
       styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
     },
   },
@@ -52,6 +55,18 @@ initUploadController(models);
 // Setup routes
 const apiRoutes = setupRoutes(models);
 app.use('/api/v1', apiRoutes);
+
+// Swagger Documentation
+app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Art & Craft API Documentation',
+}));
+
+// Swagger JSON endpoint
+app.get('/api/v1/docs.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
 
 // Default route
 app.get('/', (req, res) => {

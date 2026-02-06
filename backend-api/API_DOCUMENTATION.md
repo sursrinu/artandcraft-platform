@@ -10,7 +10,6 @@ The API uses JWT (JSON Web Token) for authentication. Include the token in the A
 ```
 Authorization: Bearer {token}
 ```
-
 ---
 
 ## API Endpoints

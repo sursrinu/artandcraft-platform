@@ -112,8 +112,9 @@ const startServer = async () => {
       }
     }
     
-    // Skip Sequelize sync to avoid hanging on table creation
-    // Tables are already created in the database
+    // Sync database tables
+    console.log('🔄 Syncing database tables...');
+    await sequelize.sync({ alter: false });
     console.log('✅ Database synchronized');
 
   } catch (error) {

@@ -115,6 +115,33 @@ const options = {
       { name: 'Vendors', description: 'Vendor operations' },
     ],
     paths: {
+      '/api/v1/auth/verify-email': {
+        post: {
+          tags: ['Auth'],
+          summary: 'Verify user email with OTP',
+          description: 'Verifies a user\'s email address using the OTP sent to their email during registration.',
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  required: ['email', 'otp'],
+                  properties: {
+                    email: { type: 'string', format: 'email' },
+                    otp: { type: 'string', description: 'One Time Password sent to user\'s email' },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            200: { description: 'Email verified successfully' },
+            400: { description: 'Invalid or expired OTP' },
+            404: { description: 'User not found' },
+          },
+        },
+      },
       '/api/v1/health': {
         get: {
           summary: 'Health check',

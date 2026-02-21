@@ -43,11 +43,23 @@ export default (sequelize, DataTypes) => {
     },
     isActive: {
       type: DataTypes.BOOLEAN,
-      defaultValue: true,
+      defaultValue: false, // Pending by default, set true after OTP verification
     },
     emailVerifiedAt: {
       type: DataTypes.DATE,
       allowNull: true,
+    },
+    otp: {
+      type: DataTypes.STRING(10),
+      allowNull: true,
+    },
+    otpExpiresAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    isEmailVerified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
     lastLogin: {
       type: DataTypes.DATE,

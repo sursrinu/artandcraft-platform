@@ -1,12 +1,63 @@
 // Authentication Service
 import bcrypt from 'bcryptjs';
 import { generateTokens, verifyRefreshToken } from '../config/jwt.js';
+import { sendOtpEmail } from '../utils/email.js';
 
 export class AuthService {
   constructor(db) {
     this.User = db.User;
     this.Vendor = db.Vendor;
     this.Cart = db.Cart;
+  }
+
+  // Resend OTP logic
+  async resendVerificationCode(email) {
+    const user = await this.User.findOne({ where: { email } });
+    if (!user) {
+      throw { statusCode: 404, message: 'User not found', code: 'NOT_FOUND' };
+    }
+    if (user.isEmailVerified) {
+      throw { statusCode: 400, message: 'Email already verified', code: 'ALREADY_VERIFIED' };
+    }
+    // Generate new OTP and expiry
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiresAt = new Date(Date.now() + 1 * 60 * 1000); // 1 min expiry
+    user.otp = otp;
+    user.otpExpiresAt = otpExpiresAt;
+    await user.save();
+    // Send OTP email
+    await sendOtpEmail(email, otp);
+    return { message: 'OTP resent to email.' };
+  }
+
+  // OTP verification logic
+  async verifyEmail(email, code) {
+    const user = await this.User.findOne({ where: { email } });
+    if (!user) {
+      throw { statusCode: 404, message: 'User not found', code: 'NOT_FOUND' };
+    }
+    if (user.isEmailVerified) {
+      throw { statusCode: 400, message: 'Email already verified', code: 'ALREADY_VERIFIED' };
+    }
+    if (!user.otp || !user.otpExpiresAt || user.otp !== code || user.otpExpiresAt < new Date()) {
+      throw { statusCode: 400, message: 'Invalid or expired OTP', code: 'INVALID_OTP' };
+    }
+    user.isEmailVerified = true;
+    user.emailVerifiedAt = new Date();
+    user.isActive = true;
+    user.otp = null;
+    user.otpExpiresAt = null;
+    await user.save();
+    // Issue tokens after verification
+    const { accessToken, refreshToken } = generateTokens(user.id, user.email, user.userType);
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      userType: user.userType,
+      accessToken,
+      refreshToken,
+    };
   }
 
   async register(userData) {
@@ -21,13 +72,21 @@ export class AuthService {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
+    // Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiresAt = new Date(Date.now() + 1 * 60 * 1000); // 1 min expiry
+
+    // Create user with OTP fields
     const user = await this.User.create({
       name,
       email,
       password: hashedPassword,
       phone,
       userType,
+      otp,
+      otpExpiresAt,
+      isEmailVerified: false,
+      isActive: false,
     });
 
     // Create cart for customer
@@ -35,29 +94,38 @@ export class AuthService {
       await this.Cart.create({ userId: user.id });
     }
 
-    // Generate tokens
-    const { accessToken, refreshToken } = generateTokens(user.id, user.email, user.userType);
+    // Send OTP email
+    await sendOtpEmail(email, otp);
 
+    // Do not issue tokens until verified
     return {
       id: user.id,
       name: user.name,
       email: user.email,
       userType: user.userType,
-      accessToken,
-      refreshToken,
+      message: 'OTP sent to email. Please verify to complete registration.'
     };
   }
 
   async login(email, password) {
-    const user = await this.User.findOne({ where: { email } });
 
+    const user = await this.User.findOne({ where: { email } });
     if (!user) {
-      throw { statusCode: 401, message: 'Invalid credentials', code: 'INVALID_CREDENTIALS' };
+      throw { statusCode: 404, message: "User doesn't exist, please register", code: 'USER_NOT_FOUND' };
     }
 
-    // Verify password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
+    if (!user.isActive || !user.isEmailVerified) {
+      throw { statusCode: 403, message: 'Account not active or email not verified. Please verify your email to activate your account.', code: 'ACCOUNT_INACTIVE' };
+    }
+
+    // Compare password
+    const isMatch = await bcrypt.compare(password, user.password);
+    console.log('[DEBUG] bcrypt.compare:', {
+      inputPassword: password,
+      dbHash: user.password,
+      isMatch
+    });
+    if (!isMatch) {
       throw { statusCode: 401, message: 'Invalid credentials', code: 'INVALID_CREDENTIALS' };
     }
 

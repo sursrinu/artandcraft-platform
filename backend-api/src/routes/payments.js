@@ -31,6 +31,11 @@ export const setupPaymentRoutes = (database) => {
  * POST /api/payments/razorpay/create-order
  */
 router.post('/razorpay/create-order', authenticate, async (req, res) => {
+  console.log('Received Razorpay order creation request', req.body);
+  // Log environment and credentials (do NOT log secrets in production)
+  console.log('Razorpay Key ID:', process.env.RAZORPAY_KEY_ID);
+  // console.log('Razorpay Key Secret:', process.env.RAZORPAY_KEY_SECRET); // Uncomment only for local debugging
+  console.log('OrderId:', req.body.orderId, 'Amount:', req.body.amount, 'Currency:', req.body.currency);
   try {
     const { orderId, amount, currency = 'INR' } = req.body;
 
@@ -45,7 +50,7 @@ router.post('/razorpay/create-order', authenticate, async (req, res) => {
     const order = await db.Order.findOne({
       where: {
         id: orderId,
-        userId: req.user.id,
+        userId: req.user.userId,
       },
     });
 
@@ -63,17 +68,19 @@ router.post('/razorpay/create-order', authenticate, async (req, res) => {
       receipt: `order_${orderId}`,
       notes: {
         orderId: orderId.toString(),
-        userId: req.user.id.toString(),
+        userId: req.user.userId.toString(),
       },
     });
 
     // Store Razorpay order ID in payment record
     await db.Payment.create({
       orderId: orderId,
+      userId: req.user.userId,
       razorpayOrderId: razorpayOrder.id,
       amount: amount / 100, // Store in rupees
       currency: currency,
       status: 'created',
+      paymentMethod: 'razorpay',
     });
 
     res.json({
@@ -88,11 +95,33 @@ router.post('/razorpay/create-order', authenticate, async (req, res) => {
       },
     });
   } catch (error) {
+    // Enhanced error logging for debugging
     console.error('Razorpay create order error:', error);
+    if (error && error.response) {
+      console.error('Razorpay error response:', JSON.stringify(error.response, null, 2));
+    }
+    if (error && error.stack) {
+      console.error('Stack trace:', error.stack);
+    }
+    // Log request body for debugging
+    console.error('Request body:', JSON.stringify(req.body, null, 2));
+    // Log order lookup result
+    try {
+      const orderDebug = await db.Order.findOne({
+        where: {
+          id: req.body.orderId,
+          userId: req.user.id,
+        },
+      });
+      console.error('Order lookup result:', orderDebug ? orderDebug.toJSON() : 'Order not found');
+    } catch (orderLookupError) {
+      console.error('Order lookup error:', orderLookupError);
+    }
     res.status(500).json({
       success: false,
       message: 'Failed to create payment order',
       error: error.message,
+      details: error.response || null,
     });
   }
 });

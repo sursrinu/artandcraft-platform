@@ -1,3 +1,31 @@
+// Resend OTP controller
+export const resendVerificationCode = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const result = await authService.resendVerificationCode(email);
+    res.status(200).json({
+      success: true,
+      message: 'OTP resent. Please check your email.',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+// OTP verification endpoint
+export const verifyEmail = async (req, res, next) => {
+  try {
+    const { email, code } = req.body;
+    const result = await authService.verifyEmail(email, code);
+    res.status(200).json({
+      success: true,
+      data: result,
+      message: 'Email verified successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 // Auth controller with full implementation
 import { AuthService } from '../services/authService.js';
 
@@ -10,7 +38,7 @@ export const initAuthController = (db) => {
 export const register = async (req, res, next) => {
   try {
     const { name, email, password, phone, userType } = req.body;
-    
+    console.log('[REGISTER] Incoming:', { name, email, phone, userType });
     const result = await authService.register({
       name,
       email,
@@ -18,13 +46,14 @@ export const register = async (req, res, next) => {
       phone,
       userType: userType || 'customer',
     });
-    
+    console.log('[REGISTER] Success:', result);
     res.status(201).json({
       success: true,
       data: result,
       message: 'User registered successfully',
     });
   } catch (error) {
+    console.error('[REGISTER] Error:', error);
     next(error);
   }
 };

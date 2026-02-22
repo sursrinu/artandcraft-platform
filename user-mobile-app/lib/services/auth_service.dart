@@ -22,8 +22,12 @@ class AuthService {
           'userType': userType,
         },
       );
+      print('Registration response: ${response.data}');
       return response.data;
     } on DioException catch (e) {
+      print('DioException: $e');
+      print('DioException response: ${e.response}');
+      print('DioException response data: ${e.response?.data}');
       throw _handleError(e);
     }
   }

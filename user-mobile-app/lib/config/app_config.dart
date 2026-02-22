@@ -4,10 +4,11 @@ class AppConfig {
   static const String appVersion = '1.0.0';
   
   // API Configuration
-  static const String apiBaseUrl = 'http://localhost:7777/api/v1';
-  // For physical devices, use: 'http://10.0.2.2:7777/api/v1'
-  // For iOS simulator, use: 'http://localhost:7777/api/v1'
-  // For production, use: 'https://api.artandcraft.com/api/v1'
+  // For local development: 'http://localhost:7777/api/v1'
+  // For Railway production:
+  static const String apiBaseUrl = 'https://artandcraft-platform-production.up.railway.app/api/v1';
+  // For physical devices local: 'http://10.0.2.2:7777/api/v1'
+  // For iOS simulator local: 'http://localhost:7777/api/v1'
   
   static const Duration apiTimeout = Duration(seconds: 30);
   

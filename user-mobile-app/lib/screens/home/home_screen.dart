@@ -15,6 +15,25 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+    @override
+    void initState() {
+      super.initState();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).clearSnackBars();
+        }
+      });
+    }
+
+    @override
+    void didChangeDependencies() {
+      super.didChangeDependencies();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).clearSnackBars();
+        }
+      });
+    }
   int _selectedIndex = 0;
   String _searchQuery = '';
   int? _selectedCategoryId;
@@ -360,7 +379,7 @@ class _ProductCard extends StatelessWidget {
       // If it's a relative path, prepend the API host
       String fullImageUrl = imageUrl;
       if (!imageUrl.startsWith('http')) {
-        fullImageUrl = 'http://localhost:7777$imageUrl';
+        fullImageUrl = 'https://artandcraft-platform-production.up.railway.app$imageUrl';
       }
       
       return ClipRRect(
@@ -528,7 +547,7 @@ class _OrderCard extends StatelessWidget {
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                   Text(
-                    '\$${(totalAmount is num ? totalAmount.toDouble() : double.parse(totalAmount.toString())).toStringAsFixed(2)}',
+                    '₹${(totalAmount is num ? totalAmount.toDouble() : double.parse(totalAmount.toString())).toStringAsFixed(2)}',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Theme.of(context).primaryColor,
@@ -711,7 +730,7 @@ class _WishlistItemCard extends ConsumerWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '\$${price.toStringAsFixed(2)}',
+                        '₹${price.toStringAsFixed(2)}',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).primaryColor,

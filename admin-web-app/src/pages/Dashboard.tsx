@@ -154,8 +154,8 @@ const Dashboard: React.FC = () => {
         />
         <StatCardComponent
           title="Total Revenue"
-          value={`$${(stats?.totalRevenue || 0).toFixed(2)}`}
-          icon={<DollarSign size={24} className="text-green-600" />}
+          value={`₹ ${(stats?.totalRevenue || 0).toFixed(2)}`}
+          icon={<span style={{fontSize: 24, color: '#16a34a', fontWeight: 600}}>&#8377;</span>}
           color="border-green-600"
         />
         <StatCardComponent
@@ -184,7 +184,7 @@ const Dashboard: React.FC = () => {
                   <tr key={order.id} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="py-3 px-4 font-medium">#{order.id}</td>
                     <td className="py-3 px-4">{order.customerName}</td>
-                    <td className="py-3 px-4">${(parseFloat(order.totalAmount) || 0).toFixed(2)}</td>
+                    <td className="py-3 px-4">₹ {(parseFloat(order.totalAmount) || 0).toFixed(2)}</td>
                     <td className="py-3 px-4">
                       <Badge label={order.status || 'Pending'} variant="success" size="sm" />
                     </td>

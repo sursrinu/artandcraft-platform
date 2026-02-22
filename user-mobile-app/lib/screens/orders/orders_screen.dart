@@ -181,7 +181,7 @@ class OrderCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Items: ${order.items.length} | Total: \$${order.total.toStringAsFixed(2)}',
+            'Items: ${order.items.length} | Total: ₹${order.total.toStringAsFixed(2)}',
             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 4),

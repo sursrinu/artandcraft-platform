@@ -58,10 +58,12 @@ class Product {
     // Parse ProductImages array
     List<String> images = [];
     final productImages = json['ProductImages'];
+    final String baseUrl = 'https://artandcraft-platform-production.up.railway.app'; // Update with your actual base URL
     if (productImages is List && productImages.isNotEmpty) {
       images = productImages
           .where((img) => img != null && img['imageUrl'] != null)
-          .map((img) => img['imageUrl'].toString())
+          //.map((img) => img['imageUrl'].toString())
+          .map((img) => '$baseUrl${img['imageUrl']}') // Prepend base URL
           .toList();
     }
     

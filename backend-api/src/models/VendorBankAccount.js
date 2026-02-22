@@ -9,10 +9,11 @@ export default (sequelize, DataTypes) => {
     vendorId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: 'Vendors',
-        key: 'id',
-      },
+      // Foreign key constraint removed to fix table creation error
+      // references: {
+      //   model: 'Vendors',
+      //   key: 'id',
+      // },
     },
     accountHolderName: {
       type: DataTypes.STRING,
@@ -74,13 +75,14 @@ export default (sequelize, DataTypes) => {
   });
 
   VendorBankAccount.associate = (models) => {
-    VendorBankAccount.belongsTo(models.Vendor, {
-      foreignKey: 'vendorId',
-      onDelete: 'CASCADE',
-    });
-    VendorBankAccount.hasMany(models.VendorPayout, {
-      foreignKey: 'bankAccountId',
-    });
+    // Foreign key association with Vendor is disabled to fix constraint error
+    // VendorBankAccount.belongsTo(models.Vendor, {
+    //   foreignKey: 'vendorId',
+    //   onDelete: 'CASCADE',
+    // });
+    // VendorBankAccount.hasMany(models.VendorPayout, {
+    //   foreignKey: 'bankAccountId',
+    // });
   };
 
   return VendorBankAccount;

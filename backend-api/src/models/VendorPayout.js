@@ -9,10 +9,11 @@ export default (sequelize, DataTypes) => {
     vendorId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: 'Vendors',
-        key: 'id',
-      },
+      // Foreign key constraint removed to fix table creation error
+      // references: {
+      //   model: 'Vendors',
+      //   key: 'id',
+      // },
     },
     payoutNumber: {
       type: DataTypes.STRING,
@@ -59,10 +60,11 @@ export default (sequelize, DataTypes) => {
     bankAccountId: {
       type: DataTypes.INTEGER,
       allowNull: true,
-      references: {
-        model: 'VendorBankAccounts',
-        key: 'id',
-      },
+      // Foreign key constraint removed to fix table creation error
+      // references: {
+      //   model: 'VendorBankAccount',
+      //   key: 'id',
+      // },
     },
     totalSales: {
       type: DataTypes.DECIMAL(12, 2),
@@ -144,10 +146,11 @@ export default (sequelize, DataTypes) => {
       foreignKey: 'vendorId',
       onDelete: 'CASCADE',
     });
-    VendorPayout.belongsTo(models.VendorBankAccount, {
-      foreignKey: 'bankAccountId',
-      allowNull: true,
-    });
+    // Foreign key association with VendorBankAccount is disabled to fix constraint error
+    // VendorPayout.belongsTo(models.VendorBankAccount, {
+    //   foreignKey: 'bankAccountId',
+    //   allowNull: true,
+    // });
   };
 
   return VendorPayout;

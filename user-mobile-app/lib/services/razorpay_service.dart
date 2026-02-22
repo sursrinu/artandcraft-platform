@@ -8,7 +8,7 @@ import './api_client.dart';
 class RazorpayConfig {
   // TODO: Replace with your actual Razorpay Key ID from dashboard
   // Test Key for development - replace with live key for production
-  static const String keyId = 'rzp_test_YOUR_KEY_ID';
+  static const String keyId = 'rzp_test_SIPKVnKXgegKYb';
   
   // Company/App name shown in Razorpay checkout
   static const String companyName = 'Art & Craft Store';
@@ -118,18 +118,20 @@ class RazorpayService {
     required Function(RazorpayPaymentResult) onError,
     Function()? onExternalWallet,
   }) {
+    debugPrint('[RazorpayService] init called');
     _razorpay = Razorpay();
     _onPaymentSuccess = onSuccess;
     _onPaymentError = onError;
     _onExternalWallet = onExternalWallet;
-
     _razorpay!.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay!.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     _razorpay!.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+    debugPrint('[RazorpayService] Event listeners registered');
   }
 
   /// Dispose Razorpay instance - call this when done
   void dispose() {
+    debugPrint('[RazorpayService] dispose called');
     _razorpay?.clear();
     _razorpay = null;
   }
@@ -142,6 +144,7 @@ class RazorpayService {
     String currency = 'INR',
   }) async {
     try {
+      debugPrint('[RazorpayService] createOrder called: orderId=$orderId, amount=$amount, currency=$currency');
       // Convert to paise (smallest currency unit for INR)
       final amountInPaise = (amount * 100).round();
       
@@ -155,11 +158,13 @@ class RazorpayService {
       );
 
       final data = response.data['data'] ?? response.data;
+      debugPrint('[RazorpayService] createOrder API response: $data');
       return RazorpayOrderDetails.fromJson({
         ...data,
         'orderId': orderId.toString(),
       });
     } on DioException catch (e) {
+      debugPrint('[RazorpayService] ERROR in createOrder: $e');
       throw _handleError(e);
     }
   }
@@ -171,7 +176,9 @@ class RazorpayService {
     String? prefillEmail,
     String? prefillPhone,
   }) {
+    debugPrint('[RazorpayService] openCheckout called');
     if (_razorpay == null) {
+      debugPrint('[RazorpayService] ERROR: Razorpay not initialized');
       throw Exception('Razorpay not initialized. Call init() first.');
     }
 
@@ -205,9 +212,11 @@ class RazorpayService {
     };
 
     try {
+      debugPrint('[RazorpayService] Opening Razorpay checkout with options: $options');
       _razorpay!.open(options);
-    } catch (e) {
-      debugPrint('Error opening Razorpay checkout: $e');
+      debugPrint('[RazorpayService] Razorpay.open() called');
+    } catch (e, st) {
+      debugPrint('[RazorpayService] ERROR opening Razorpay checkout: $e\n$st');
       rethrow;
     }
   }

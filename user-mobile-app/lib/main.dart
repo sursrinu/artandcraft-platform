@@ -15,6 +15,8 @@ import 'screens/profile/profile_screen.dart';
 import 'screens/profile/add_address_screen.dart';
 import 'screens/profile/edit_address_screen.dart';
 
+import 'screens/auth/otp_verification_screen.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {

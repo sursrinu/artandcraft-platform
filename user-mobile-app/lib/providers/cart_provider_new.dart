@@ -1,14 +1,22 @@
-// Cart Provider
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/cart_service.dart';
 
+// Cart Provider
 final cartServiceProvider = Provider((ref) => CartService());
 
 // Get cart
 final cartProvider = FutureProvider<Cart>(
   (ref) async {
     final service = ref.watch(cartServiceProvider);
-    return service.getCart();
+    try {
+      final cart = await service.getCart();
+      debugPrint('[cartProvider] Cart fetched: ${cart.toString()}');
+      return cart;
+    } catch (e) {
+      debugPrint('[cartProvider] Error fetching cart: $e');
+      rethrow;
+    }
   },
 );
 

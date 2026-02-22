@@ -15,6 +15,15 @@ class CheckoutScreen extends ConsumerStatefulWidget {
 }
 
 class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+      }
+    });
+  }
   int _currentStep = 0;
   String? _selectedAddressId;
   bool _isProcessing = false;
@@ -42,6 +51,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+      }
+    });
     _fullNameController = TextEditingController();
     _phoneController = TextEditingController();
     _addressLine1Controller = TextEditingController();
@@ -54,7 +68,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     _expiryController = TextEditingController();
     _cvcController = TextEditingController();
     _upiIdController = TextEditingController();
-    
     // Initialize Razorpay
     _razorpayService = RazorpayService();
     _razorpayService.init(
@@ -124,7 +137,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           }
           print('█████████████████████████████████████');
           print('');
-          
+
           // Parse cart data
           List items = [];
           double subtotal = 0;
@@ -135,7 +148,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             try {
               // Handle Cart object from provider
               List<dynamic>? cartItems;
-              
+
               // It's a Cart object - access properties directly
               final cart = cartData as dynamic;
               if (cart.items is List) {
@@ -151,20 +164,19 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               if (cartItems != null && cartItems.isNotEmpty) {
                 items = cartItems.map((item) {
                   if (item is Map) {
-                    // Handle both product price and Product.price structures
+                    final itemMap = Map<String, dynamic>.from(item);
                     double price = 0.0;
-                    if (item['price'] != null) {
-                      price = item['price'] is num ? (item['price'] as num).toDouble() : double.tryParse(item['price'].toString()) ?? 0.0;
-                    } else if (item['Product'] != null && item['Product']['price'] != null) {
-                      price = item['Product']['price'] is num ? (item['Product']['price'] as num).toDouble() : double.tryParse(item['Product']['price'].toString()) ?? 0.0;
+                    if (itemMap['price'] != null) {
+                      price = itemMap['price'] is num ? (itemMap['price'] as num).toDouble() : double.tryParse(itemMap['price'].toString()) ?? 0.0;
+                    } else if (itemMap['Product'] != null && itemMap['Product']['price'] != null) {
+                      price = itemMap['Product']['price'] is num ? (itemMap['Product']['price'] as num).toDouble() : double.tryParse(itemMap['Product']['price'].toString()) ?? 0.0;
                     }
-                    
                     return {
-                      'id': item['id'] ?? 0,
-                      'productId': item['productId'] ?? 0,
-                      'productName': item['productName'] ?? item['Product']?['name'] ?? '',
+                      'id': itemMap['id'] ?? 0,
+                      'productId': itemMap['productId'] ?? 0,
+                      'productName': itemMap['productName'] ?? itemMap['Product']?['name'] ?? '',
                       'price': price,
-                      'quantity': item['quantity'] ?? 1,
+                      'quantity': itemMap['quantity'] ?? 1,
                     };
                   } else {
                     // It's an object
@@ -176,7 +188,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       final p = (item as dynamic).Product.price;
                       price = p is num ? (p as num).toDouble() : double.tryParse(p.toString()) ?? 0.0;
                     }
-                    
                     return {
                       'id': (item as dynamic).id ?? 0,
                       'productId': (item as dynamic).productId ?? 0,

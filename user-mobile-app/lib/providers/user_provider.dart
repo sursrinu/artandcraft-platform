@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/user_service.dart';
 import '../services/api_client.dart';
@@ -10,38 +11,50 @@ final userServiceProvider = Provider((ref) {
 // Get user profile - only fetch if authenticated
 final userProfileProvider = FutureProvider<dynamic>((ref) async {
   final authState = ref.watch(authProvider);
-  
+  debugPrint('[userProfileProvider] authState: \\${authState.toString()}');
   // Only fetch profile if user is authenticated
   if (!authState.isAuthenticated) {
+    debugPrint('[userProfileProvider] Not authenticated, returning null');
     return null;
   }
-  
   final userService = ref.watch(userServiceProvider);
-  return await userService.getProfile();
+  try {
+    final profile = await userService.getProfile();
+    debugPrint('[userProfileProvider] Profile fetched: \\${profile.toString()}');
+    return profile;
+  } catch (e) {
+    debugPrint('[userProfileProvider] Error fetching profile: \\${e.toString()}');
+    rethrow;
+  }
 });
 
 // Get user addresses - only fetch if authenticated
 final userAddressesProvider = FutureProvider<dynamic>((ref) async {
   final authState = ref.watch(authProvider);
-  
+  debugPrint('[userAddressesProvider] authState: \\${authState.toString()}');
   // Only fetch addresses if user is authenticated
   if (!authState.isAuthenticated) {
+    debugPrint('[userAddressesProvider] Not authenticated, returning empty list');
     return [];
   }
-  
   final userService = ref.watch(userServiceProvider);
-  return await userService.getAddresses();
+  try {
+    final addresses = await userService.getAddresses();
+    debugPrint('[userAddressesProvider] Addresses fetched: \\${addresses.toString()}');
+    return addresses;
+  } catch (e) {
+    debugPrint('[userAddressesProvider] Error fetching addresses: \\${e.toString()}');
+    rethrow;
+  }
 });
 
 // Get user wishlist - only fetch if authenticated
 final userWishlistProvider = FutureProvider<dynamic>((ref) async {
   final authState = ref.watch(authProvider);
-  
   // Only fetch wishlist if user is authenticated
   if (!authState.isAuthenticated) {
     return [];
   }
-  
   final userService = ref.watch(userServiceProvider);
   return await userService.getWishlist();
 });
@@ -251,7 +264,7 @@ class AddToWishlistNotifier extends StateNotifier<AsyncValue<dynamic>> {
 }
 
 final addToWishlistProvider =
-    StateNotifierProvider.autoDispose<AddToWishlistNotifier, AsyncValue<dynamic>>((ref) {
+    StateNotifierProvider<AddToWishlistNotifier, AsyncValue<dynamic>>((ref) {
   final userService = ref.watch(userServiceProvider);
   return AddToWishlistNotifier(userService);
 });

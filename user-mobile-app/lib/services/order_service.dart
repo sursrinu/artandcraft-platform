@@ -266,9 +266,12 @@ class OrderService {
       
       // Backend returns { orders: [...], totalAmount, message }
       // Get the first order from the array
-      final responseData = response.data['data'] ?? {};
+      final responseDataRaw = response.data['data'] ?? {};
+      final Map<String, dynamic> responseData = responseDataRaw is Map<String, dynamic>
+          ? responseDataRaw
+          : Map<String, dynamic>.from(responseDataRaw);
       final List<dynamic> orders = responseData['orders'] ?? [];
-      
+
       if (orders.isNotEmpty) {
         return Order.fromJson(orders[0] as Map<String, dynamic>);
       } else {

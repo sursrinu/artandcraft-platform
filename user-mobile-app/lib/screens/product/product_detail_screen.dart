@@ -19,6 +19,25 @@ class ProductDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
+    @override
+    void initState() {
+      super.initState();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).clearSnackBars();
+        }
+      });
+    }
+
+    @override
+    void didChangeDependencies() {
+      super.didChangeDependencies();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).clearSnackBars();
+        }
+      });
+    }
   int _quantity = 1;
   int _currentImageIndex = 0;
 
@@ -602,7 +621,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   Widget _buildImageWidget(String imageUrl) {
     String fullImageUrl = imageUrl;
     if (!imageUrl.startsWith('http')) {
-      fullImageUrl = 'http://localhost:7777$imageUrl';
+      fullImageUrl = 'https://artandcraft-platform-production.up.railway.app$imageUrl';
     }
 
     return ClipRRect(
@@ -651,7 +670,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     if (imageUrl != null && imageUrl.isNotEmpty) {
       String fullImageUrl = imageUrl;
       if (!imageUrl.startsWith('http')) {
-        fullImageUrl = 'http://localhost:7777$imageUrl';
+        fullImageUrl = 'https://artandcraft-platform-production.up.railway.app$imageUrl';
       }
       
       return ClipRRect(

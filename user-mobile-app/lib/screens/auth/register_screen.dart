@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/auth_provider.dart';
+import 'otp_verification_screen.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -34,13 +35,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     super.dispose();
   }
 
+  bool _showOtpScreen = false;
+  String? _pendingEmail;
+  bool _otpLoading = false;
+  String? _otpError;
+
+  void _clearError() {
+    final authNotifier = ref.read(authProvider.notifier);
+    authNotifier.state = authNotifier.state.copyWith(error: null);
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
     final authNotifier = ref.read(authProvider.notifier);
 
-    // Show error message if registration fails
     ref.listen(authProvider, (previous, next) {
+      debugPrint('authProvider state changed: error=${next.error}, isAuthenticated=${next.isAuthenticated}');
       if (next.error != null && next.error!.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -49,12 +60,49 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           ),
         );
       }
-      
-      // Navigate to home on successful registration
-      if (next.isAuthenticated && mounted) {
+      // Only navigate to home if authenticated and not in OTP flow
+      if (next.isAuthenticated && mounted && !_showOtpScreen) {
         Navigator.of(context).pushReplacementNamed('/home');
       }
     });
+
+    if (_showOtpScreen && _pendingEmail != null) {
+      return OtpVerificationScreen(
+        email: _pendingEmail!,
+        isLoading: _otpLoading,
+        error: _otpError,
+        onSubmit: (code) async {
+          setState(() {
+            _otpLoading = true;
+            _otpError = null;
+          });
+          try {
+            await authNotifier.verifyEmail(
+              email: _pendingEmail!,
+              code: code,
+            );
+            final state = ref.read(authProvider);
+            if (state.error == null) {
+              if (mounted) {
+                Navigator.of(context).pushReplacementNamed('/login');
+              }
+            } else {
+              setState(() {
+                _otpError = state.error;
+              });
+            }
+          } catch (e) {
+            setState(() {
+              _otpError = e.toString();
+            });
+          } finally {
+            setState(() {
+              _otpLoading = false;
+            });
+          }
+        },
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -127,12 +175,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             );
                             return;
                           }
-
+                          _clearError();
+                          debugPrint('Attempting registration for email: "+_emailController.text+"');
                           await authNotifier.register(
                             name: _nameController.text,
                             email: _emailController.text,
                             password: _passwordController.text,
                           );
+                          final state = ref.read(authProvider);
+                          debugPrint('Registration result: error={state.error}, message={state.message}');
+                          if (state.error == null) {
+                            setState(() {
+                              _showOtpScreen = true;
+                              _pendingEmail = _emailController.text;
+                            });
+                          }
                         },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),

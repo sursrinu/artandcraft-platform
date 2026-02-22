@@ -89,7 +89,7 @@ class OrderDetailScreen extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text('Subtotal:'),
-                          Text('\$${_getOrderSubtotal(orderData).toStringAsFixed(2)}'),
+                          Text('₹${_getOrderSubtotal(orderData).toStringAsFixed(2)}'),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -97,7 +97,7 @@ class OrderDetailScreen extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text('Shipping:'),
-                          Text('\$${_getOrderShipping(orderData).toStringAsFixed(2)}'),
+                          Text('₹${_getOrderShipping(orderData).toStringAsFixed(2)}'),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -112,7 +112,7 @@ class OrderDetailScreen extends ConsumerWidget {
                             ),
                           ),
                           Text(
-                            '\$${_getOrderTotal(orderData).toStringAsFixed(2)}',
+                            '₹${_getOrderTotal(orderData).toStringAsFixed(2)}',
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -228,7 +228,7 @@ class OrderDetailScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  Text('\$${item.price.toStringAsFixed(2)}'),
+                  Text('₹${item.price.toStringAsFixed(2)}'),
                 ],
               ),
             ),
@@ -266,7 +266,7 @@ class OrderDetailScreen extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    Text('\$${item['price']}'),
+                    Text('₹${item['price']}'),
                   ],
                 ),
               ),

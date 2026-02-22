@@ -22,7 +22,8 @@ class DevelopmentEnvironment implements Environment {
   static const String appName = 'Art & Craft Store (Dev)';
   
   @override
-  static const String apiBaseUrl = 'http://localhost:5000/api/v1';
+  static const String apiBaseUrl = 'https://artandcraft-platform-production.up.railway.app/api/v1';
+  //static const String apiBaseUrl = 'http://localhost:5000/api/v1';
   // For Android emulator: 'http://10.0.2.2:5000/api/v1'
   // For iOS simulator: 'http://localhost:5000/api/v1'
   // For physical device: 'http://192.168.x.x:5000/api/v1'
@@ -73,7 +74,8 @@ class ProductionEnvironment implements Environment {
   static const String appName = 'Art & Craft Store';
   
   @override
-  static const String apiBaseUrl = 'https://api.artandcraft.com/api/v1';
+  static const String apiBaseUrl = 'https://artandcraft-platform-production.up.railway.app/api/v1';
+  //static const String apiBaseUrl = 'https://api.artandcraft.com/api/v1';
   
   @override
   static const Duration apiTimeout = Duration(seconds: 30);

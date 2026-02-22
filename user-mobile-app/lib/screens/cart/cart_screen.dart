@@ -10,8 +10,26 @@ class CartScreen extends ConsumerStatefulWidget {
 }
 
 class _CartScreenState extends ConsumerState<CartScreen> {
+
   String? _couponCode;
   String? _couponError;
+
+  @override
+  void initState() {
+    super.initState();
+    _resetErrorState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _resetErrorState();
+  }
+
+  void _resetErrorState() {
+    _couponError = null;
+    // Optionally reset other error-related state here
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,9 +56,8 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           // cartData is a Cart object
           List items = [];
           double subtotal = 0;
-          double tax = 0;
+          // Removed tax
           double total = 0;
-          
           // Handle Cart object from provider
           if (cartData != null) {
             try {
@@ -99,8 +116,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               // Parse totals - use property access instead of []
               final rawSubtotal = cart.subtotal;
               subtotal = rawSubtotal is double ? rawSubtotal : (rawSubtotal is num ? (rawSubtotal as num).toDouble() : double.tryParse(rawSubtotal?.toString() ?? '0') ?? 0.0);
-              final rawTax = cart.tax;
-              tax = rawTax is double ? rawTax : (rawTax is num ? (rawTax as num).toDouble() : double.tryParse(rawTax?.toString() ?? '0') ?? 0.0);
+              // Removed tax parsing
               final rawTotal = cart.total;
               total = rawTotal is double ? rawTotal : (rawTotal as num?)?.toDouble() ?? 0.0;
             } catch (e) {
@@ -151,7 +167,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   ),
                 ),
               ),
-              _buildCartSummary(context, subtotal, tax, total),
+              _buildCartSummary(context, subtotal, total),
             ],
           );
         },
@@ -159,7 +175,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     );
   }
 
-  Widget _buildCartSummary(BuildContext context, double subtotal, double tax, double total) {
+  Widget _buildCartSummary(BuildContext context, double subtotal, double total) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -193,10 +209,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           if (_couponError != null)
             Padding(
               padding: const EdgeInsets.only(top: 8),
-              child: Text(
-                _couponError!,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.red),
-              ),
+              child: Text(_couponError!, style: const TextStyle(color: Colors.red)),
             ),
           const SizedBox(height: 16),
           // Totals
@@ -204,17 +217,11 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text('Subtotal:'),
-              Text('\$${subtotal.toStringAsFixed(2)}'),
+              Text('₹${subtotal.toStringAsFixed(2)}'),
             ],
           ),
           const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('Tax (10%):'),
-              Text('\$${tax.toStringAsFixed(2)}'),
-            ],
-          ),
+          // Tax row removed
           const SizedBox(height: 8),
           Divider(color: Colors.grey[300]),
           const SizedBox(height: 8),
@@ -226,7 +233,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
               Text(
-                '\$${total.toStringAsFixed(2)}',
+                '₹${total.toStringAsFixed(2)}',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).primaryColor,
@@ -313,44 +320,28 @@ class _CartItemCard extends StatelessWidget {
                 children: [
                   Text(
                     name,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '\$${price.toStringAsFixed(2)}',
-                    style: Theme.of(context).textTheme.bodySmall,
+                    style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   const SizedBox(height: 8),
-                  // Quantity Control
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey[300]!),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove, size: 16),
-                          onPressed: quantity > 1
-                              ? () => onUpdateQuantity(quantity - 1)
-                              : null,
-                          iconSize: 16,
-                          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                        ),
-                        Text(quantity.toString()),
-                        IconButton(
-                          icon: const Icon(Icons.add, size: 16),
-                          onPressed: () => onUpdateQuantity(quantity + 1),
-                          iconSize: 16,
-                          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                        ),
-                      ],
-                    ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.remove, size: 16),
+                        onPressed: quantity > 1
+                            ? () => onUpdateQuantity(quantity - 1)
+                            : null,
+                        iconSize: 16,
+                        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                      ),
+                      Text(quantity.toString()),
+                      IconButton(
+                        icon: const Icon(Icons.add, size: 16),
+                        onPressed: () => onUpdateQuantity(quantity + 1),
+                        iconSize: 16,
+                        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -362,7 +353,7 @@ class _CartItemCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  '\$${itemTotal.toStringAsFixed(2)}',
+                  '₹${itemTotal.toStringAsFixed(2)}',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),

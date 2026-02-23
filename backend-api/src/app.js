@@ -101,7 +101,7 @@ app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 }));
 
 // Swagger JSON endpoint
-app.get('/api/v1/docs.json', (req, res) => {
+app.get('/backend-api/api/v1/docs.json', (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.send(swaggerSpec);
 });

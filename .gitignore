@@ -56,3 +56,4 @@ backend-api/coverage/
 *.log
 npm-debug.log*
 backend-api/.env
+backend-api/.env

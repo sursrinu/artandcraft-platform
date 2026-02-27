@@ -1,26 +1,83 @@
+ios/Podfile.lock
+ios/Flutter/Generated.xcconfig
+=======
+migrate_working_dir/
+
+# Flutter
+.dart_tool/
+.flutter-plugins
+.packages
+pubspec.lock
+build/
+.env
+
+# Android
+android/local.properties
+android/.gradle
+android/captures/
+android/gradlew.bat
+android/gradlew
+.android/
+
+# iOS
+ios/Pods/
+ios/Podfile.lock
+ios/.symlinks/
+ios/Flutter/Generated.xcconfig
+
+# Web
+web/packages/
+web/.dart_tool/
+
+# Laravel
+admin-web-app/vendor/
+admin-web-app/.env
+admin-web-app/.env.*.php
+admin-web-app/.env.backup
+admin-web-app/bootstrap/cache/
+admin-web-app/storage/logs/
+admin-web-app/storage/debugbar/
+admin-web-app/node_modules/
+admin-web-app/public/storage
+admin-web-app/public/hot
+
+# Backend API
+backend-api/node_modules/
+backend-api/.env
+backend-api/dist/
+backend-api/coverage/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+*.iml
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+*.log
+npm-debug.log*
+
 # Miscellaneous
 *.class
-*.log
 *.pyc
-*.swp
-.DS_Store
 .atom/
 .build/
 .buildlog/
 .history
 .svn/
 .swiftpm/
-migrate_working_dir/
+
 
 # IntelliJ related
-*.iml
 *.ipr
 *.iws
-.idea/
 
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be committed to version control.
-.vscode/
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
@@ -29,13 +86,9 @@ migrate_working_dir/
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
-.dart_tool/
-.flutter-plugins
 .flutter-plugins-dependencies
-.packages
 .pub-cache/
 .pub/
-/build/
 
 # Symbolication related
 app.*.symbols
@@ -59,7 +112,6 @@ app.*.map.json
 **/ios/**/.symlinks/
 **/ios/**/Flutter/Flutter.framework
 **/ios/**/Flutter/Flutter.podspec
-**/ios/**/Flutter/Generated.xcconfig
 **/ios/**/Flutter/ephemeralEnv.sh
 **/ios/**/Flutter/app.flx
 **/ios/**/Flutter/app.zip
@@ -73,55 +125,14 @@ app.*.map.json
 **/android/**/gradlew
 **/android/**/gradlew.bat
 **/android/**/gradle-wrapper.jar
-**/android/.gradle
-**/android/captures/
-**/android/gradlew.bat
-**/android/gradlew
-**/android/local.properties
 **/android/**/GeneratedPluginRegistrant.java
 **/android/key.properties
 **/*.jks
 **/*.keystore
 
-# Web
-
-# Symbolication related
-app.*.symbols
-
-# Obfuscation related
-app.*.map.json
-
-# iOS/macOS
-**/ios/**/*.mode1v3
-**/ios/**/*.mode2v3
-**/ios/**/*.moved-aside
-**/ios/**/*.pbxuser
-**/ios/**/*.perspectivev3
-**/ios/**/*sync/
-**/ios/**/.sconsign.dblite
-**/ios/**/.tags*
-**/ios/**/.vagrant/
-**/ios/**/DerivedData/
-**/ios/**/Icon?
-**/ios/**/Pods/
-**/ios/**/.symlinks/
-**/ios/**/Flutter/Flutter.framework
-**/ios/**/Flutter/Flutter.podspec
-**/ios/**/Flutter/Generated.xcconfig
-**/ios/**/Flutter/ephemeralEnv.sh
-**/ios/**/Flutter/app.flx
-**/ios/**/Flutter/app.zip
-**/ios/**/Flutter/flutter_assets/
-**/ios/**/Flutter/flutter_export_environment.sh
-**/ios/**/GoogleService-Info.plist
-**/ios/**/ServiceAccountKey.json
-**/ios/**/Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
-
 # macOS
 **/macos/Flutter/GeneratedPluginRegistrant.swift
 **/macos/Flutter/GeneratedPlugins.swift
-
-# Web
 
 # Windows
 windows/flutter/generated_plugin_registrant.cc
@@ -138,3 +149,4 @@ coverage/
 
 # Exceptions to above rules.
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
+

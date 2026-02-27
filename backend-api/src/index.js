@@ -3,6 +3,9 @@ import dotenv from 'dotenv';
 // Load environment variables FIRST before importing anything else
 dotenv.config();
 
+// Debug: Print all SMTP_ environment variables
+console.log('Loaded SMTP_ ENV:', Object.fromEntries(Object.entries(process.env).filter(([k]) => k.startsWith('SMTP_'))));
+
 // Now dynamically import the app so all env vars are loaded
 const { default: app } = await import('./app.js');
 

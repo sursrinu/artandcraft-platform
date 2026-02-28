@@ -27,7 +27,7 @@ export async function sendOtpEmail(to, otp, method = EMAIL_METHOD) {
       const msg = {
         to,
         from: process.env.SENDGRID_FROM || process.env.SMTP_FROM,
-        subject: 'Your OTP for Art & Craft Registration',
+        subject: 'Your OTP for Urs Art & Craft Registration',
         text: `Your OTP code is: ${otp}`,
         html: `<p>Your OTP code is: <b>${otp}</b></p>`,
       };

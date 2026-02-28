@@ -209,7 +209,7 @@ class ApiService {
         data: { 
           data: { 
             settings: {
-              appName: 'Art & Craft Platform',
+              appName: 'Urs Art & Craft Platform',
               appEmail: 'admin@artandcraft.com',
               platformCommission: 10,
               minOrderAmount: 100,

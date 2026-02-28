@@ -2,7 +2,7 @@
 // Use this file to manage environment-specific settings
 
 abstract class Environment {
-  static const String appName = 'Art & Craft Store';
+  static const String appName = 'Urs Art & Craft Store';
   static const String appVersion = '1.0.0';
   
   // API Configuration

@@ -44,7 +44,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Art & Craft Store'),
+        title: const Text('Urs Art & Craft Store'),
         elevation: 1,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,

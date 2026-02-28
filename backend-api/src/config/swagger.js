@@ -7,7 +7,7 @@ const options = {
     info: {
       title: 'Art & Craft Platform API',
       version: '1.0.0',
-      description: 'API documentation for the Art & Craft e-commerce platform',
+      description: 'API documentation for the Urs Art & Craft e-commerce platform',
       contact: {
         name: 'API Support',
         email: 'support@artandcraft.com',

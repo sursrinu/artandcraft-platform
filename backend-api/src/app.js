@@ -97,7 +97,7 @@ app.use('/api/v1', apiRoutes);
 // Swagger Documentation
 app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'Art & Craft API Documentation',
+  customSiteTitle: 'Urs Art & Craft API Documentation',
 }));
 
 // Swagger JSON endpoint

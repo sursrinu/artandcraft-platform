@@ -11,7 +11,7 @@ class RazorpayConfig {
   static const String keyId = 'rzp_test_SIPKVnKXgegKYb';
   
   // Company/App name shown in Razorpay checkout
-  static const String companyName = 'Art & Craft Store';
+  static const String companyName = 'Urs Art & Craft Store';
   
   // App description
   static const String description = 'Payment for your order';

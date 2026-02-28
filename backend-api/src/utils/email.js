@@ -1,7 +1,14 @@
 // ...existing code...
+
 import nodemailer from 'nodemailer';
+import sgMail from '@sendgrid/mail';
+
+if (process.env.SENDGRID_API_KEY) {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+}
 
 const EMAIL_METHOD = process.env.EMAIL_METHOD || 'smtp';
+
 
 export async function sendOtpEmail(to, otp, method = EMAIL_METHOD) {
   // Debug: Log config and recipient
@@ -14,6 +21,26 @@ export async function sendOtpEmail(to, otp, method = EMAIL_METHOD) {
   console.log('[OTP EMAIL] SMTP_USER:', process.env.SMTP_USER);
   console.log('[OTP EMAIL] SMTP_PASSWORD:', process.env.SMTP_PASSWORD);
   console.log('[OTP EMAIL] SMTP_FROM:', process.env.SMTP_FROM);
+
+  if (method === 'sendgrid') {
+    try {
+      const msg = {
+        to,
+        from: process.env.SENDGRID_FROM || process.env.SMTP_FROM,
+        subject: 'Your OTP for Art & Craft Registration',
+        text: `Your OTP code is: ${otp}`,
+        html: `<p>Your OTP code is: <b>${otp}</b></p>`,
+      };
+      await sgMail.send(msg);
+      console.log('[OTP EMAIL] Email sent via SendGrid');
+    } catch (err) {
+      console.error('[OTP EMAIL] Failed to send OTP email via SendGrid:', err);
+      throw err;
+    }
+    return;
+  }
+
+  // Default to SMTP
   try {
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || 'smtp.gmail.com',

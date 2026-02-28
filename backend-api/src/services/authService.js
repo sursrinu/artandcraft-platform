@@ -21,7 +21,7 @@ export class AuthService {
     }
     // Generate new OTP and expiry
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpiresAt = new Date(Date.now() + 1 * 60 * 1000); // 1 min expiry
+    const otpExpiresAt = new Date(Date.now() + 2 * 60 * 1000); // 2 min expiry
     user.otp = otp;
     user.otpExpiresAt = otpExpiresAt;
     await user.save();

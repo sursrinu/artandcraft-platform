@@ -1,5 +1,6 @@
 // Review Service - Handles review endpoints
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../services/api_client.dart';
 import '../models/api_models.dart';
 
@@ -64,6 +65,7 @@ class ReviewService {
     String? sortOrder = 'desc',
   }) async {
     try {
+      debugPrint('[ReviewService] getProductReviews called for productId=$productId, page=$page, perPage=$perPage');
       final response = await _apiClient.get(
         '/reviews/products/$productId',
         queryParameters: {
@@ -73,10 +75,12 @@ class ReviewService {
           'sortOrder': sortOrder,
         },
       );
-      
+      debugPrint('[ReviewService] API response: status=${response.statusCode}, data=${response.data}');
+
       // Extract the data object which contains 'reviews' and 'pagination'
       final responseData = response.data['data'] ?? {};
-      
+      debugPrint('[ReviewService] responseData: $responseData');
+
       // Convert the response to match PaginatedResponse structure
       // The API returns { reviews: [...], pagination: {...} }
       // But PaginatedResponse expects { data: [...], pagination: {...} }
@@ -84,13 +88,18 @@ class ReviewService {
         'data': responseData['reviews'] ?? [],
         'pagination': responseData['pagination'] ?? {},
       };
-      
+      debugPrint('[ReviewService] transformedData: $transformedData');
+
       return PaginatedResponse.fromJson(
         transformedData,
         Review.fromJson,
       );
     } on DioException catch (e) {
+      debugPrint('[ReviewService] DioException: $e');
       throw _handleError(e);
+    } catch (e, st) {
+      debugPrint('[ReviewService] Unexpected error: $e\n$st');
+      rethrow;
     }
   }
 

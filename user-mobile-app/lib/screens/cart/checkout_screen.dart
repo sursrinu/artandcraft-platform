@@ -1023,35 +1023,37 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   /// Handle successful Razorpay payment
   void _handlePaymentSuccess(RazorpayPaymentResult result) async {
     debugPrint('✅ Payment successful: ${result.paymentId}');
-    
     if (!mounted) return;
-    
-    // Verify payment on backend
-    // In production, always verify the signature on your backend
-    try {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Row(
-            children: [
-              SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-              ),
-              SizedBox(width: 12),
-              Text('Verifying payment...'),
-            ],
-          ),
+
+    // Show verifying payment snackbar
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Row(
+          children: [
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+            ),
+            SizedBox(width: 12),
+            Text('Verifying payment...'),
+          ],
         ),
-      );
-      
-      // Note: In production, you should verify the payment signature on your backend
-      // The backend should verify: razorpay_order_id + "|" + razorpay_payment_id
-      // using HMAC SHA256 with your Razorpay key secret
-      
-      setState(() => _isProcessing = false);
-      
-      ScaffoldMessenger.of(context).clearSnackBars();
+      ),
+    );
+
+    // Call backend to verify payment
+    final verified = await _razorpayService.verifyPayment(
+      razorpayOrderId: result.orderId ?? '',
+      razorpayPaymentId: result.paymentId ?? '',
+      razorpaySignature: result.signature ?? '',
+      orderId: int.tryParse(result.orderId ?? '') ?? 0,
+    );
+
+    setState(() => _isProcessing = false);
+    ScaffoldMessenger.of(context).clearSnackBars();
+
+    if (verified) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Row(
@@ -1067,16 +1069,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           duration: const Duration(seconds: 3),
         ),
       );
-      
       // Clear cart and navigate to orders
       ref.invalidate(cartProvider);
       Navigator.of(context).pushReplacementNamed('/orders');
-    } catch (e) {
-      setState(() => _isProcessing = false);
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Payment verification failed: $e'),
-          backgroundColor: Colors.orange,
+        const SnackBar(
+          content: Text('Payment verification failed. Please contact support.'),
+          backgroundColor: Colors.red,
         ),
       );
     }

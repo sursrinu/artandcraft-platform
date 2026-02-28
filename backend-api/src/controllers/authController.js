@@ -38,6 +38,8 @@ export const initAuthController = (db) => {
 export const register = async (req, res, next) => {
   try {
     const { name, email, password, phone, userType } = req.body;
+    // Debug log: print raw email received from client
+    console.log('[REGISTER] Raw req.body.email:', req.body.email);
     console.log('[REGISTER] Incoming:', { name, email, phone, userType });
     const result = await authService.register({
       name,

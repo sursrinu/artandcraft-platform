@@ -19,15 +19,24 @@ class ProductDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
-    @override
-    void initState() {
-      super.initState();
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).clearSnackBars();
-        }
-      });
-    }
+
+
+  late final Map<String, dynamic> _reviewsParams;
+
+  @override
+  void initState() {
+    super.initState();
+    _reviewsParams = {
+      'productId': widget.productId,
+      'page': 1,
+      'perPage': 5,
+    };
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+      }
+    });
+  }
 
     @override
     void didChangeDependencies() {
@@ -38,6 +47,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         }
       });
     }
+
   int _quantity = 1;
   int _currentImageIndex = 0;
 
@@ -93,14 +103,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     return 'No description available';
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     final productAsync = ref.watch(productByIdProvider(widget.productId));
-    final reviewsAsync = ref.watch(productReviewsProvider({
-      'productId': widget.productId,
-      'page': 1,
-      'perPage': 5,
-    }));
+    final reviewsAsync = ref.watch(productReviewsProvider(_reviewsParams));
 
     return Scaffold(
       appBar: AppBar(
@@ -390,28 +398,57 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
   Widget _buildReviewsSection(AsyncValue reviewsAsync) {
     return reviewsAsync.when(
-      loading: () => const CircularProgressIndicator(),
-      error: (error, _) => Text('Error loading reviews: $error'),
+      loading: () {
+        debugPrint('[ReviewsSection] Loading reviews...');
+        return const CircularProgressIndicator();
+      },
+      error: (error, stack) {
+        debugPrint('[ReviewsSection] Error loading reviews: $error');
+        debugPrint('[ReviewsSection] Stack: $stack');
+        return Text('Error loading reviews: $error');
+      },
       data: (reviewsData) {
+        debugPrint('[ReviewsSection] reviewsData: '
+            '${reviewsData.runtimeType} - $reviewsData');
         List reviews = [];
         if (reviewsData is Map && reviewsData['items'] is List) {
           reviews = reviewsData['items'];
         } else if (reviewsData is List) {
           reviews = reviewsData;
+        } else {
+          debugPrint('[ReviewsSection] Unexpected reviewsData structure: $reviewsData');
+        }
+
+        // Fix: If no reviews, show message and do not reload
+        if (reviews.isEmpty) {
+          return Column(
+            children: [
+              Text(
+                'No reviews yet',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(
+                      '/product/${widget.productId}/reviews',
+                    );
+                  },
+                  child: const Text('View All Reviews'),
+                ),
+              ),
+            ],
+          );
         }
 
         return Column(
           children: [
-            if (reviews.isEmpty)
-              Text(
-                'No reviews yet',
-                style: Theme.of(context).textTheme.bodyMedium,
-              )
-            else
-              ...reviews.asMap().entries.map((entry) {
-                final review = entry.value;
-                return _buildReviewCard(review);
-              }),
+            ...reviews.asMap().entries.map((entry) {
+              final review = entry.value;
+              return _buildReviewCard(review);
+            }),
             const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,

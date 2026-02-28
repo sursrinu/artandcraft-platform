@@ -16,14 +16,14 @@ export const handleValidationErrors = (req, res, next) => {
 
 export const validateRegister = [
   body('name').notEmpty().trim().escape(),
-  body('email').isEmail().normalizeEmail(),
+  body('email').isEmail().normalizeEmail({ gmail_remove_dots: false }),
   body('password').isLength({ min: 6 }),
   body('phone').optional().isMobilePhone(),
   handleValidationErrors,
 ];
 
 export const validateLogin = [
-  body('email').isEmail().normalizeEmail(),
+  body('email').isEmail().normalizeEmail({ gmail_remove_dots: false }),
   body('password').notEmpty(),
   handleValidationErrors,
 ];

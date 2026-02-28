@@ -9,7 +9,6 @@ if (process.env.SENDGRID_API_KEY) {
 
 const EMAIL_METHOD = process.env.EMAIL_METHOD || 'smtp';
 
-
 export async function sendOtpEmail(to, otp, method = EMAIL_METHOD) {
   // Debug: Log config and recipient
   console.log('[OTP EMAIL] Preparing to send OTP email');
@@ -19,12 +18,6 @@ export async function sendOtpEmail(to, otp, method = EMAIL_METHOD) {
     console.log('[OTP EMAIL] Using SendGrid for email delivery.');
   } else if (method === 'smtp') {
     console.log('[OTP EMAIL] Using SMTP for email delivery.');
-    // Debug: Print all SMTP env vars
-    console.log('[OTP EMAIL] SMTP_HOST:', process.env.SMTP_HOST);
-    console.log('[OTP EMAIL] SMTP_PORT:', process.env.SMTP_PORT);
-    console.log('[OTP EMAIL] SMTP_USER:', process.env.SMTP_USER);
-    console.log('[OTP EMAIL] SMTP_PASSWORD:', process.env.SMTP_PASSWORD);
-    console.log('[OTP EMAIL] SMTP_FROM:', process.env.SMTP_FROM);
   } else {
     console.log('[OTP EMAIL] Unknown EMAIL_METHOD:', method);
   }
@@ -38,7 +31,7 @@ export async function sendOtpEmail(to, otp, method = EMAIL_METHOD) {
         text: `Your OTP code is: ${otp}`,
         html: `<p>Your OTP code is: <b>${otp}</b></p>`,
       };
-      console.log('[OTP EMAIL] [SendGrid] Sending email:', msg);
+      // Removed verbose payload log
       await sgMail.send(msg);
       console.log('[OTP EMAIL] Email sent via SendGrid');
     } catch (err) {
@@ -68,7 +61,7 @@ export async function sendOtpEmail(to, otp, method = EMAIL_METHOD) {
       html: `<p>Your OTP code is: <b>${otp}</b></p>`
     };
 
-    console.log('[OTP EMAIL] [SMTP] Sending email:', mailOptions);
+    // Removed verbose payload log
     const info = await transporter.sendMail(mailOptions);
     console.log('[OTP EMAIL] Email sent via SMTP:', info.messageId);
   } catch (err) {

@@ -3,9 +3,6 @@ import dotenv from 'dotenv';
 // Load environment variables FIRST before importing anything else
 dotenv.config();
 
-// Debug: Print all environment variables at startup
-console.log('Loaded ENV:', process.env);
-
 // Now dynamically import the app so all env vars are loaded
 const { default: app } = await import('./app.js');
 

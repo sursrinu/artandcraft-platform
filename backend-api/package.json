@@ -47,7 +47,8 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "uuid": "^9.0.1",
-    "winston": "^3.19.0"
+    "winston": "^3.19.0",
+    "@sendgrid/mail": "^7.7.0"
   },
   "devDependencies": {
     "eslint": "^8.56.0",

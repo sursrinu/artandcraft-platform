@@ -146,11 +146,12 @@ export default (sequelize, DataTypes) => {
       foreignKey: 'vendorId',
       onDelete: 'CASCADE',
     });
-    // Foreign key association with VendorBankAccount is disabled to fix constraint error
-    // VendorPayout.belongsTo(models.VendorBankAccount, {
-    //   foreignKey: 'bankAccountId',
-    //   allowNull: true,
-    // });
+    // Keep association for query includes, but disable constraints to avoid migration issues.
+    VendorPayout.belongsTo(models.VendorBankAccount, {
+      foreignKey: 'bankAccountId',
+      as: 'VendorBankAccount',
+      constraints: false,
+    });
   };
 
   return VendorPayout;

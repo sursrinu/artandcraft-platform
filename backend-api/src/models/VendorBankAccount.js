@@ -80,9 +80,11 @@ export default (sequelize, DataTypes) => {
     //   foreignKey: 'vendorId',
     //   onDelete: 'CASCADE',
     // });
-    // VendorBankAccount.hasMany(models.VendorPayout, {
-    //   foreignKey: 'bankAccountId',
-    // });
+    VendorBankAccount.hasMany(models.VendorPayout, {
+      foreignKey: 'bankAccountId',
+      as: 'VendorPayouts',
+      constraints: false,
+    });
   };
 
   return VendorBankAccount;

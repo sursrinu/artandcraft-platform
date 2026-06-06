@@ -19,7 +19,7 @@ abstract class Environment {
 /// Development Environment
 class DevelopmentEnvironment implements Environment {
   @override
-  static const String appName = 'Art & Craft Store (Dev)';
+  static const String appName = 'Urs Art & Craft Store (Dev)';
   
   @override
   static const String apiBaseUrl = 'https://artandcraft-platform-production.up.railway.app/api/v1';

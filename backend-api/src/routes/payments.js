@@ -15,12 +15,22 @@ let db = null;
  */
 export const setupPaymentRoutes = (database) => {
   db = database;
+
+  const keyId = process.env.RAZORPAY_KEY_ID;
+  const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+  if (!keyId || !keySecret) {
+    throw new Error('RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET must be set');
+  }
+
+  if (!keyId.startsWith('rzp_live_')) {
+    throw new Error('Live Razorpay key required. Set RAZORPAY_KEY_ID to rzp_live_xxx');
+  }
   
   // Initialize Razorpay
-  // TODO: Replace with your actual Razorpay credentials from dashboard
   razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_YOUR_KEY_ID',
-    key_secret: process.env.RAZORPAY_KEY_SECRET || 'YOUR_KEY_SECRET',
+    key_id: keyId,
+    key_secret: keySecret,
   });
 
   return router;
@@ -46,6 +56,15 @@ router.post('/razorpay/create-order', authenticate, async (req, res) => {
       });
     }
 
+    // Ensure amount is an integer (Razorpay requires amount in paise as integer)
+    const amountInPaise = parseInt(Math.floor(amount), 10);
+    if (isNaN(amountInPaise) || amountInPaise <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid amount. Must be a positive integer in paise',
+      });
+    }
+
     // Verify the order exists and belongs to the user
     const order = await db.Order.findOne({
       where: {
@@ -63,7 +82,7 @@ router.post('/razorpay/create-order', authenticate, async (req, res) => {
 
     // Create Razorpay order
     const razorpayOrder = await razorpay.orders.create({
-      amount: amount, // Amount in paise
+      amount: amountInPaise, // Amount in paise (integer)
       currency: currency,
       receipt: `order_${orderId}`,
       notes: {
@@ -110,7 +129,7 @@ router.post('/razorpay/create-order', authenticate, async (req, res) => {
       const orderDebug = await db.Order.findOne({
         where: {
           id: req.body.orderId,
-          userId: req.user.id,
+          userId: req.user.userId,
         },
       });
       console.error('Order lookup result:', orderDebug ? orderDebug.toJSON() : 'Order not found');
@@ -119,9 +138,9 @@ router.post('/razorpay/create-order', authenticate, async (req, res) => {
     }
     res.status(500).json({
       success: false,
-      message: 'Failed to create payment order',
+      message: 'Failed to create payment order. ' + error.message,
       error: error.message,
-      details: error.response || null,
+      statusCode: error.statusCode || 500,
     });
   }
 });
@@ -149,7 +168,7 @@ router.post('/razorpay/verify', authenticate, async (req, res) => {
     // Verify signature using HMAC SHA256
     const body = razorpay_order_id + '|' + razorpay_payment_id;
     const expectedSignature = crypto
-      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET || 'YOUR_KEY_SECRET')
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
       .update(body)
       .digest('hex');
 

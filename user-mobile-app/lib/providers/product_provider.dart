@@ -61,3 +61,12 @@ final similarProductsProvider = FutureProvider.family<List<Product>, int>(
     return service.getSimilarProducts(productId);
   },
 );
+
+// Invalidate all product-related providers to force refetch from backend.
+void invalidateAllProductProviders(WidgetRef ref) {
+  ref.invalidate(productsProvider);
+  ref.invalidate(searchProductsProvider);
+  ref.invalidate(featuredProductsProvider);
+  ref.invalidate(productsByCategoryProvider);
+  ref.invalidate(similarProductsProvider);
+}

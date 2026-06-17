@@ -180,7 +180,7 @@ class OrderDetailScreen extends ConsumerWidget {
   double _getOrderShipping(dynamic orderData) {
     if (orderData is Order) return orderData.shipping;
     if (orderData is Map) {
-      final v = orderData['shipping'] ?? 10;
+      final v = orderData['shipping'] ?? 0;
       if (v is num) return v.toDouble();
       return double.tryParse(v?.toString() ?? '') ?? 0;
     }

@@ -152,7 +152,7 @@ class _ProductListViewState extends ConsumerState<_ProductListView> {
         ? ref.watch(searchProductsProvider(widget.searchQuery))
         : widget.selectedCategoryId != null
             ? ref.watch(productsByCategoryProvider(widget.selectedCategoryId!))
-            : ref.watch(featuredProductsProvider);
+            : ref.watch(productsProvider((page: 1, perPage: 20, search: null, categoryId: null)));
 
     return SingleChildScrollView(
       child: Column(
@@ -202,17 +202,12 @@ class _ProductListViewState extends ConsumerState<_ProductListView> {
               ),
             ),
             data: (productsData) {
-              // productsData is PaginatedResponse<Product> or List<Product>
+              // All providers now return PaginatedResponse<Product>
               List<dynamic> products = [];
               
               try {
-                if (productsData is List) {
-                  // Featured products returns List<Product>
-                  products = productsData.cast<dynamic>();
-                } else {
-                  // Search and category return PaginatedResponse<Product>
-                  products = (productsData as dynamic).items as List<dynamic>;
-                }
+                // productsData is PaginatedResponse<Product>
+                products = (productsData as dynamic).items as List<dynamic>;
               } catch (e) {
                 debugPrint('Error extracting products: $e');
               }

@@ -6,9 +6,12 @@ import './api_client.dart';
 
 /// Configuration for Razorpay
 class RazorpayConfig {
-  // TODO: Replace with your actual Razorpay Key ID from dashboard
-  // Test Key for development - replace with live key for production
-  static const String keyId = 'rzp_test_SIPKVnKXgegKYb';
+  // Prefer --dart-define=RAZORPAY_KEY_ID=... at build time.
+  // Fallback keeps release APK functional even if dart-define is missed.
+  static const String keyId = String.fromEnvironment(
+    'RAZORPAY_KEY_ID',
+    defaultValue: 'rzp_live_T0PTykWOM137bg',
+  );
   
   // Company/App name shown in Razorpay checkout
   static const String companyName = 'Urs Art & Craft Store';
@@ -177,6 +180,9 @@ class RazorpayService {
     String? prefillPhone,
   }) {
     debugPrint('[RazorpayService] openCheckout called');
+    if (RazorpayConfig.keyId.isEmpty) {
+      throw Exception('Razorpay key is not configured. Pass --dart-define=RAZORPAY_KEY_ID=rzp_live_xxx');
+    }
     if (_razorpay == null) {
       debugPrint('[RazorpayService] ERROR: Razorpay not initialized');
       throw Exception('Razorpay not initialized. Call init() first.');

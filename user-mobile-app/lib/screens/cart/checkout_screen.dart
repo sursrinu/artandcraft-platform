@@ -6,6 +6,7 @@ import '../../providers/user_provider.dart';
 import '../../providers/payment_provider.dart';
 import '../../providers/order_provider.dart';
 import '../../services/razorpay_service.dart';
+import '../../services/user_service.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
   const CheckoutScreen({Key? key}) : super(key: key);
@@ -47,6 +48,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   // Razorpay service
   late RazorpayService _razorpayService;
   dynamic _pendingCartData;
+  int? _pendingBackendOrderId;
 
   @override
   void initState() {
@@ -530,7 +532,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 const Text('Shipping:'),
-                                const Text('\$10.00'),
+                                const Text('\$0.00'),
                               ],
                             ),
                             const SizedBox(height: 12),
@@ -546,7 +548,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                                   ),
                                 ),
                                 Text(
-                                  '\$${(total + 10).toStringAsFixed(2)}',
+                                  '\$${total.toStringAsFixed(2)}',
                                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: Theme.of(context).primaryColor,
@@ -947,7 +949,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       totalAmount = rawTotal is double 
           ? rawTotal 
           : (rawTotal is num ? (rawTotal as num).toDouble() : double.tryParse(rawTotal?.toString() ?? '0') ?? 0.0);
-      totalAmount += 10; // Add shipping
     }
 
     // First create the order in pending state
@@ -964,6 +965,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       if (orderId == 0) {
         throw Exception('Failed to create order');
       }
+
+      // Keep backend order ID for Razorpay verification callback.
+      _pendingBackendOrderId = orderId;
       
       try {
         // Create Razorpay order
@@ -980,7 +984,12 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         String? userPhone;
         
         userAsync.whenData((user) {
-          if (user != null && user is Map) {
+          if (user == null) return;
+          if (user is UserProfile) {
+            userName = user.name;
+            userEmail = user.email;
+            userPhone = user.phone;
+          } else if (user is Map) {
             userName = user['name']?.toString();
             userEmail = user['email']?.toString();
             userPhone = user['phone']?.toString();
@@ -1025,6 +1034,12 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     debugPrint('✅ Payment successful: ${result.paymentId}');
     if (!mounted) return;
 
+    final backendOrderId = _pendingBackendOrderId ?? 0;
+    debugPrint(
+      '🔎 Verifying payment. backendOrderId=$backendOrderId, '
+      'razorpayOrderId=${result.orderId}, razorpayPaymentId=${result.paymentId}',
+    );
+
     // Show verifying payment snackbar
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -1047,7 +1062,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       razorpayOrderId: result.orderId ?? '',
       razorpayPaymentId: result.paymentId ?? '',
       razorpaySignature: result.signature ?? '',
-      orderId: int.tryParse(result.orderId ?? '') ?? 0,
+      orderId: backendOrderId,
     );
 
     setState(() => _isProcessing = false);
@@ -1071,6 +1086,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       );
       // Clear cart and navigate to orders
       ref.invalidate(cartProvider);
+      _pendingBackendOrderId = null;
       Navigator.of(context).pushReplacementNamed('/orders');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1089,6 +1105,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     if (!mounted) return;
     
     setState(() => _isProcessing = false);
+    _pendingBackendOrderId = null;
     
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -1119,6 +1136,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   /// Handle external wallet selection
   void _handleExternalWallet() {
     debugPrint('📱 External wallet selected');
+    debugPrint('ℹ️ Waiting for Razorpay success/error callback after wallet flow');
     // External wallets like Paytm, PhonePe will handle payment in their own app
     // The result will come back through success/error handlers
   }

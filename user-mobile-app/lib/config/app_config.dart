@@ -37,7 +37,8 @@ class AppConfig {
   static const Duration receiveTimeout = Duration(seconds: 30);
   
   // App Environment
-  static const String environment = 'development'; // 'development', 'staging', 'production'
+  static const String environment = 'production'; // 'development', 'staging', 'production'
+static const bool enableDebugLogging = false; // Must be false for production
   
   // Enable/Disable features
   static const bool enableAnalytics = true;
